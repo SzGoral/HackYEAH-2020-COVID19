@@ -25,12 +25,19 @@ def home(request, pk=None):
     # if pk:
     #     exp = Experiment.objects.using('retina').get(pk=pk)
     #
-    expname = [row.experimentname.split('/')[-1] for row in rows_in_exp]
-    expdict = {Experiment.objects.using('retina')[0]: 'exp_with_pk'}
-    expdict.update({Experiment.objects.using('retina')[1]: 'exp_with_pk'})
-    expdict.update({Experiment.objects.using('retina')[2]: 'exp_with_pk'})
+    # expname = [row.experimentname.split('/')[-1] for row in rows_in_exp]
+    # expdict = {Experiment.objects.using('retina')[0]: 'exp_with_pk'}
+    # expdict.update({Experiment.objects.using('retina')[1]: 'exp_with_pk'})
+    # expdict.update({Experiment.objects.using('retina')[2]: 'exp_with_pk'})
+    lista_punktow = [
+            ['04042020', 49.820352, 19.335300, 16],
+            ['04042020', 49.967382, 19.337302, 23],
+            ['03042020', -34.028249, 151.157507, 9],
+            ['03042020', -33.80010128657071, 151.28747820854187, 16],
+            ['03042020', -33.950198, 151.259302, 19]
+             ]
 
-    return render(request, 'retina/home_button.html', {'expdict': expdict})
+    return render(request, 'retina/home_button.html', {'lista_punktow': lista_punktow})
 
 
 def about(request):

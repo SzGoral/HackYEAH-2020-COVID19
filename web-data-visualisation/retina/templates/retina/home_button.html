@@ -3,10 +3,104 @@
 <div class="media-body">
     <p>Welcome to RETINA's project website. Please choose an experiment for visualization:</p>
 </div>
-{% for k, v in expdict.items %}
+{% for k in lista_punktow %}
 <div class="media-body">
     <!--...-->
-    <a href="{% url v pk=k.pk %}" class="btn btn-info">experiment {{ k.get_name }}!</a>
+    <a > {{ k }}</a>
 </div>
 {% endfor %}
+
+<section class="mano">
+<section class="DisplayMap-mano">
+    <div id="map"></div>
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 49.817182, lng: 19.335202},
+            zoom: 10
+            });
+
+           var locations = {{ lista_punktow|safe }};
+
+
+            var marker, i;
+
+slider.addEventListener("mousemove", function() {
+
+    for (i = 0; i < locations.length; i++) {
+
+        if(locations[i][3] == slider.value){
+            marker = new google.maps.Marker({
+            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+            map: map
+            });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+            infowindow.setContent(locations[i][0]);
+            infowindow.open(map, marker);
+            }
+            })(marker, i));
+        }
+
+
+    }
+
+     })
+
+
+<!--            {% for k in lista_punkow %}-->
+<!--                lista = k;-->
+
+<!--                var uluru = {lat: lista[0], lng: lista[1]};-->
+<!--                var marker = new google.maps.Marker({position: uluru, map: map});-->
+<!--                marker.setMap(map);-->
+
+<!--            {% endfor %}-->
+
+        }
+    </script>
+</section>
+
+
+
+
+<footer class="FooterDay-mano">
+    <div class="sliderContainer">
+        <input type="range" min="5" max="23" id="myRange" class="slider"/>
+        <p>Time: <span id="TimeValue"></span></p>
+    </div>
+
+    <script>
+        console.log('lel');
+        var slider = document.getElementById("myRange");
+        console.log(slider);
+        var output = document.getElementById("TimeValue");
+        console.log(output);
+
+         output.innerHTML = slider.value;
+
+
+
+        slider.addEventListener("mousemove", function() {
+             var x = slider.value;
+             var currentPositionX = x * 100 / 24;
+            var color = 'linear-gradient(90deg, #E39774 ' + currentPositionX + '%, #326273 ' + currentPositionX + '%)';
+            slider.style.background = color;
+            output.innerHTML =  x + ':00';
+        })
+
+
+    </script>
+
+</footer>
+
+
+</section>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDZHNi4rj5OE_76aVo91XarAwdUT8hUzcU&callback=initMap">
+</script>
+
+
+
 {% endblock content %}

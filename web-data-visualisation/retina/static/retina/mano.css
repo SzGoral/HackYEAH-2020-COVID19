@@ -1,0 +1,102 @@
+.mano {
+    position: relative;
+}
+
+/* BEGIN display maps */
+
+#map {
+        height: 100%;
+    	width: 100%;
+    	margin: 0 auto;
+
+    	background-color: #adadad;
+      }
+
+.DisplayMap-mano {
+    width: 100%;
+    height: 100vh;
+
+    background-color: #eee;
+
+}
+
+/* END display maps */
+
+/* BEGIN footer */
+
+.FooterDay-mano {
+    width: 100%;
+    height: 70px;
+
+    position: absolute;
+    bottom: 0px;
+
+    clear: both;
+
+    background-color: #272727;
+    z-index: 9;
+}
+
+/* END footer */
+
+.sliderContainer {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+
+
+.slider {
+    -webkit-appearance: none;
+
+    width: 100%;
+    height: 30px;
+
+    -webkit-transition: 0.2s;
+    border-radius: 15px;
+    box-shadow: 0px 1px 10px 1px black;
+
+    background: linear-gradient(90deg, #E39774 60%, #326273 60%);
+    outline: none;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    background: #FAE8EB;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 40px;
+    height: 40px;
+    background: #FAE8EB;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.sliderContainer p {
+    text-align: center;
+    color: #FAE8EB;
+}
+
+.slider::after {
+    content: '23:00';
+    color: #FAE8EB;
+    position: absolute;
+    left: 90%;
+    top: 37px;
+
+    }
+
+.slider::before {
+    content: '5:00';
+    color: #FAE8EB;
+    position: absolute;
+    left: 5%;
+    top: 37px;
+
+}
