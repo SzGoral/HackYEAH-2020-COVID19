@@ -4,16 +4,20 @@ from constants import DATABASE_PATH, LAT_KEY, LONG_KEY, DATETIME_KEY
 
 
 def load_database():
-    db = dict()
     with open(DATABASE_PATH, "r") as f:
         data = json.load(f)
-        for entry in data:
-            lat, long, datetime = get_fixed_vals(entry)
-            date, time = datetime.split("T")
-            time = time[:2]
-            all_day_loc = db.setdefault(date, dict())
-            loc = all_day_loc.setdefault(time, set())
-            loc.add((lat, long))
+    return json2db(data)
+
+
+def json2db(data):
+    db = dict()
+    for entry in data:
+        lat, long, datetime = get_fixed_vals(entry)
+        date, time = datetime.split("T")
+        time = time[:2]
+        all_day_loc = db.setdefault(date, dict())
+        loc = all_day_loc.setdefault(time, set())
+        loc.add((lat, long))
     return db
 
 

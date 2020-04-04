@@ -1,2 +1,2 @@
-from .keys import *
+from .others import *
 from .paths import *

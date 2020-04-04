@@ -1,3 +1,5 @@
 LAT_KEY = "lat"
 LONG_KEY = "long"
 DATETIME_KEY = "datetime"
+
+GEOLOCATION_THRESHOLD = 0.00027
