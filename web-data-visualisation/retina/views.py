@@ -1,6 +1,6 @@
 import json
-
 from django.shortcuts import render
+
 from .models import Experiment, DataFolder, RawData
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
@@ -8,6 +8,14 @@ from collections import defaultdict
 from django.views.generic import ListView, CreateView, UpdateView
 from .forms import DataForm
 from django.http import HttpResponse
+from django.http import Http404
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import JsonResponse
+from django.core import serializers
+from django.conf import settings
 from .plotting import plot_pxmy_to_bytes, plot_pxmy_and_neighbours, plot_pxmy_without_neighbours
 from os.path import join
 from io import BytesIO
@@ -21,6 +29,19 @@ datadict = defaultdict(list)
 # for row in rows_in_data:
 #     datadict[row.exp.pk].append(row.dataxxx)
 
+@api_view(['POST'])
+def SendDataOutside(local_trace):
+    print(" local to: ", local_trace)
+    print("typ to: ", type(local_trace))
+    suma = 0
+    try:
+        height = json.loads(local_trace.body)
+        print(" local to: ", height)
+        print("typ to: ", type(height))
+
+        return JsonResponse("Ideal" + 'kg', safe=False)
+    except ValueError as e:
+        return Response(e.args[0], status.HTTP_400_BAD_REQUEST)
 
 @login_required
 def home(request, pk=None):
