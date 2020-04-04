@@ -1,0 +1,353 @@
+{% extends 'retina/base.html' %}
+
+{% block pat_num %}
+
+<h2>Plot data for given pattern and movie:</h2>
+
+<div id="single_pattern_plot"  data-pattern-url="{% url 'ajax_load_pattern_number' %}"
+                               data-dataxxx-url="{% url 'ajax_load_dataxxx' %}"
+                               data-movie-for-pattern-url="{% url 'ajax_load_movie_for_pattern' %}"
+
+     novalidate>
+    {% csrf_token %}
+    <table>
+        <tbody>
+        <tr>
+            <th><label for="pattern_data">Data:</label></th>
+            <td><select name="data" required="" id="pattern_data">
+                <option value="null">---------</option>
+            </select></td>
+        </tr>
+        <tr>
+            <th><label for="pattern_number">Pattern number:</label></th>
+            <td><select name="pattern_number" required="" id="pattern_number">
+            </select></td>
+            <th><label for="movie_for_pattern">Movie number:</label></th>
+            <td><select name="movie_number" required="" id="movie_for_pattern">
+            </select></td>
+        </tr>
+        <tr>
+            <th width="50"><label for="electrode_to_plot">Electrode to plot:</label></th>
+            <td width="50"><input type="text" name="Electrode to plot" maxlength="5" required="" id="electrode_to_plot"></td>
+
+        </tr>
+        <tr>
+            <th><label for="x_range_min">X axis min:</label></th>
+            <td><input type="text" name="x_range_min" maxlength="5" id="x_range_min"></td>
+            <th><label for="x_range_max">X axis max:</label></th>
+            <td><input type="text" name="x_range_max" maxlength="5" id="x_range_max"></td>
+        </tr>
+        <tr>
+            <th><label for="y_range_min">Y axis min:</label></th>
+            <td><input type="text" name="y_range_min" maxlength="5" id="y_range_min"></td>
+            <th><label for="y_range_max">Y axis max:</label></th>
+            <td><input type="text" name="y_range_max" maxlength="5" id="y_range_max"></td>
+        </tr>
+        <tr>
+            <th><button id="pattern_plot_button">Plot</button></th>
+            <th>
+                <button id="previous_plot">Previous Plot</button>
+                <button id="next_plot">Next Plot</button>
+            <th><button id="matrix">Show matrix</button></th>
+        </tr>
+        </tbody>
+    </table>
+    <th colspan="2"><label class="error-msg" id="pattern_error_label"></label></th>
+
+</div>
+<div id="divo" class="plot-div">
+    <th> <label> Plot neighbours: </label><input type="checkbox" id="neigh"> </th>
+    <img id="pattern_plot" class="plot-size">
+</div>
+<br><br>
+
+<script>
+    $("#pattern_plot").click(function(e){
+        var pWidth = $(this).innerWidth();
+        var pOffset = $(this).offset();
+        var x = e.pageX - pOffset.left;
+        if(pWidth/3 > x){
+            $('#movie_for_pattern option:selected').prev().prop('selected', true);
+            plot()
+            }
+        else if(pWidth/3*2 < x){
+            $('#movie_for_pattern option:selected').next().prop('selected', true);
+            plot()
+            }
+        else{
+            if($("#neigh").prop("checked")){
+                $("#neigh").prop("checked", false)
+                plot()
+            }
+            else{
+                $("#neigh").prop("checked", true)
+                plot()
+            }
+        }
+    });
+
+    plot = function() {
+        var ele_to_plot = $("#electrode_to_plot").val();
+        var pat_num = $("#pattern_number").val();
+        var data_id = $("#pattern_data").val();
+        var movie_number = $("#movie_for_pattern").val();
+        var y_axis_min =$("#y_range_min").val();
+        var y_axis_max =$("#y_range_max").val();
+        var x_axis_min =$("#x_range_min").val();
+        var x_axis_max =$("#x_range_max").val();
+        var neighbours =$("#neigh").prop("checked");
+        $('div#divo').show();
+
+        if (data_id == null || data_id == 'null') {
+            $("#pattern_error_label").html("ERROR!: 'Data' is not selected!");
+        }
+
+        else if (pat_num == null || pat_num == 'null') {
+            $("#pattern_error_label").html("ERROR!: 'Pattern number' is not selected!");
+        }
+
+        else if (movie_number == null || movie_number == 'null') {
+            $("#pattern_error_label").html("ERROR!: 'Movie number' is not selected!");
+        }
+
+        else if (!isNormalInteger(ele_to_plot)){
+            $("#pattern_error_label").html("ERROR!: 'Electrode to plot' is not a number!");
+        }
+
+        else if (ele_to_plot > 512 || ele_to_plot < 1){ //TODO 512 import from static
+            $("#pattern_error_label").html("ERROR!: Electrode to plot out of range. Must be beetween <1, 512>");
+        }
+
+        else{
+            $("#pattern_error_label").html("");
+            $('#pattern_plot').attr('src', "");
+            $('#pattern_plot').attr('src', "/ajax/plot-pattern-png/?pat_num=" + pat_num //TODO przerob na ajaxa loader
+            +"&data_id=" + data_id
+            +"&movie_number=" + movie_number
+            +"&ele_to_plot=" + ele_to_plot
+            +"&neighbours=" + neighbours
+            +"&y_axis_min=" + y_axis_min
+            +"&y_axis_max=" + y_axis_max
+            +"&x_axis_min=" + x_axis_min
+            +"&x_axis_max=" + x_axis_max);
+        }
+    }
+
+    $("#pattern_data").change(function () {
+        $(function () {
+          var url = $("#single_pattern_plot").attr("data-pattern-url")
+
+          $.ajax({
+            url: url,
+            data: {
+                'data_id': $("#pattern_data").val()
+            },
+            success: function (data) {
+              $("#pattern_number").html(data);
+            }
+          });
+        });
+    });
+
+    $("#neigh").change(function(){
+        plot()
+    });
+
+    $("#pattern_number").change(function () {
+        $(function () {
+          var url = $("#single_pattern_plot").attr("data-movie-for-pattern-url")
+
+          $.ajax({
+            url: url,
+            data: {
+                'pat_num': $("#pattern_number").val(),
+                'data_id': $("#pattern_data").val()
+            },
+            success: function (data) {
+              $("#movie_for_pattern").html(data);
+            }
+          });
+        });
+    });
+
+    $(function () {
+      var url = $("#single_pattern_plot").attr("data-dataxxx-url")
+      var exp_id = '{{ pk }}';
+      $.ajax({
+        url: url,
+        data: {
+          'exp_id': exp_id
+        },
+        success: function (data) {
+          $("#pattern_data").html(data);
+        }
+      });
+    });
+
+    $('#next_plot').click(function() {
+        $('#movie_for_pattern option:selected').next().prop('selected', true);
+        plot()
+    });
+
+    $('#previous_plot').click(function() {
+        $('#movie_for_pattern option:selected').prev().prop('selected', true);
+        plot()
+    });
+
+    $("#matrix").click(function(){
+    var h= screen.height;
+    var w= screen.width;
+    window.open("/static/retina/matryca.png", '_blank' , 'width='+w+', height='+h+'');
+    });
+
+    function isNormalInteger(str) {
+        var n = Math.floor(Number(str));
+        return n !== Infinity && String(n) === str;// TODO export to general functions
+    }
+    $( "#pattern_plot_button" ).click(plot);
+
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+
+<h2>Plot data for single pxmy file:</h2>
+
+<div id="dataForm"  data-pxmy-url="{% url 'ajax_load_pxmy' %}"
+                    data-dataxxx-url="{% url 'ajax_load_dataxxx' %}"
+                    data-pattern-url="{% url 'ajax_load_pattern' %}"
+
+     novalidate>
+    {% csrf_token %}
+    <table>
+        <tbody>
+        <tr>
+            <th><label for="id_data">Data:</label></th>
+            <td><select name="data" required="" id="id_data">
+                <option value="null">---------</option>
+            </select></td>
+        </tr>
+        <tr>
+            <th><label for="id_px_my">Px my:</label></th>
+            <td><select name="px_my" required="" id="id_px_my">
+            </select></td>
+        </tr>
+        <tr>
+            <th><label for="id_pattern_file">Pattern file:</label></th>
+            <td><p id="id_pattern_file"></p></td>
+        </tr>
+        <tr>
+            <th><label for="electrode_number_min">Electrode number from:</label></th>
+            <td><input type="text" name="Electrode number from" maxlength="100" required="" id="electrode_number_min"></td>
+        </tr>
+        <tr>
+            <th><label for="electrode_number_max">Electrode number to:</label></th>
+            <td><input type="text" name="Electrode number to" maxlength="100" required="" id="electrode_number_max"></td>
+        </tr>
+        <tr>
+            <th><button id="plot_button">Plot</button></th>
+
+        </tr>
+        </tbody>
+    </table>
+    <th colspan="2"><label class="error-msg" id="error_label"></label></th>
+
+
+</div>
+<div id='single-plot' class="plot-div">
+    <img id="plot" class="plot-size">
+</div>
+
+<script>
+    $("#id_data").change(function () {
+        $(function () {
+          var url = $("#dataForm").attr("data-pxmy-url")
+
+          $.ajax({
+            url: url,
+            data: {
+                'data_id': $("#id_data").val()
+            },
+            success: function (data) {
+              $("#id_px_my").html(data);
+            }
+          });
+        });
+    });
+
+    $("#id_px_my").change(function () {
+        $(function () {
+
+          var url = $("#dataForm").attr("data-pattern-url")
+
+          $.ajax({
+            url: url,
+            data: {
+                'pxmy_id': $("#id_px_my").val()
+            },
+            success: function (data) {
+              $("#id_pattern_file").html(data);
+            }
+          });
+        });
+    });
+
+    $(function () {
+      var url = $("#dataForm").attr("data-dataxxx-url")
+      var exp_id = '{{ pk }}';
+      $.ajax({
+        url: url,
+        data: {
+          'exp_id': exp_id
+        },
+        success: function (data) {
+          $("#id_data").html(data);
+        }
+      });
+    });
+
+    function isNormalInteger(str) {
+        var n = Math.floor(Number(str));
+        return n !== Infinity && String(n) === str;
+    }
+    $( "#plot_button" ).click(function() {
+        var elect_min = $("#electrode_number_min").val();
+        var elect_max = $("#electrode_number_max").val();
+        var id_pxmy = $("#id_px_my").val()
+        $('div#single-plot').show();
+
+        if (!isNormalInteger(elect_min)){
+            $("#error_label").html("ERROR!: 'Electrode number from' is not a number!");
+        }
+
+        else if (!isNormalInteger(elect_max)){
+            $("#error_label").html("ERROR!: 'Electrode number to' is not a number!");
+        }
+
+        else if (elect_min > 512 || elect_max > 512 || elect_min < 1 || elect_max < 1){ //TODO 512 import from static
+            $("#error_label").html("ERROR!: Electrode number out of range. Must be beetween <1, 512>!");
+        }
+
+        else if (id_pxmy == null || id_pxmy == 'null') {
+            $("#error_label").html("ERROR!: 'Px my' is not selected!");
+        }
+
+        else if (parseInt(elect_min) > parseInt(elect_max)){
+            $("#error_label").html("ERROR!: 'Electrode number from' is bigger than 'Electrode number to'!");
+        } else{
+            $("#error_label").html("");
+            $('#plot').attr('src', "");
+            $('#plot').attr('src', "/ajax/plot-png/?rawdata_id="+id_pxmy
+            +"&electrode_from="+elect_min
+            +"&electrode_to="+elect_max);
+        }
+    });
+
+</script>
+
+{% endblock %}
+
+
+
