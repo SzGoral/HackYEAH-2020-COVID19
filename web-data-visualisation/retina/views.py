@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from .models import Experiment, DataFolder, RawData
 from django.contrib.auth.decorators import login_required
@@ -13,11 +15,11 @@ import logging
 
 
 logger = logging.getLogger(__name__)
-rows_in_exp = Experiment.objects.using('retina').all()
-rows_in_data = DataFolder.objects.using('retina').all()
+# rows_in_exp = Experiment.objects.using('retina').all()
+# rows_in_data = DataFolder.objects.using('retina').all()
 datadict = defaultdict(list)
-for row in rows_in_data:
-    datadict[row.exp.pk].append(row.dataxxx)
+# for row in rows_in_data:
+#     datadict[row.exp.pk].append(row.dataxxx)
 
 
 @login_required
@@ -25,12 +27,14 @@ def home(request, pk=None):
     # if pk:
     #     exp = Experiment.objects.using('retina').get(pk=pk)
     #
-    expname = [row.experimentname.split('/')[-1] for row in rows_in_exp]
-    expdict = {Experiment.objects.using('retina')[0]: 'exp_with_pk'}
-    expdict.update({Experiment.objects.using('retina')[1]: 'exp_with_pk'})
-    expdict.update({Experiment.objects.using('retina')[2]: 'exp_with_pk'})
+    # expname = [row.experimentname.split('/')[-1] for row in rows_in_exp]
+    # expdict = {Experiment.objects.using('retina')[0]: 'exp_with_pk'}
+    # expdict.update({Experiment.objects.using('retina')[1]: 'exp_with_pk'})
+    # expdict.update({Experiment.objects.using('retina')[2]: 'exp_with_pk'})
+    with open(r'C:\HackYEAH_2020\HackYEAH-2020-COVID19\db.json', 'r') as file:
+        parsed_json = json.load(file)
 
-    return render(request, 'retina/home_button.html', {'expdict': expdict})
+    return render(request, 'retina/home_button.html', {'json': parsed_json})
 
 
 def about(request):

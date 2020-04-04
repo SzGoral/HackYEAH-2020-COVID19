@@ -3,10 +3,10 @@
 <div class="media-body">
     <p>Welcome to RETINA's project website. Please choose an experiment for visualization:</p>
 </div>
-{% for k, v in expdict.items %}
+{% for k, v in json.items %}
 <div class="media-body">
     <!--...-->
-    <a href="{% url v pk=k.pk %}" class="btn btn-info">experiment {{ k.get_name }}!</a>
+    <a>experiment {{ k }}!</a>
 </div>
 {% endfor %}
 {% endblock content %}

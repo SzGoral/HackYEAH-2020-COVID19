@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -81,17 +82,17 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
-    'retina': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': os.getenv('DATABASE_URL', '127.0.0.1'),
-        'PORT': os.getenv('DATABASE_PORT', '3306'),
-        'OPTIONS': {
-            'sql_mode': 'STRICT_TRANS_TABLES',
-        },
-    }
+    # 'retina': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'test',
+    #     'USER': 'root',
+    #     'PASSWORD': '',
+    #     'HOST': os.getenv('DATABASE_URL', '127.0.0.1'),
+    #     'PORT': os.getenv('DATABASE_PORT', '3306'),
+    #     'OPTIONS': {
+    #         'sql_mode': 'STRICT_TRANS_TABLES',
+    #     },
+    # }
 }
 
 
